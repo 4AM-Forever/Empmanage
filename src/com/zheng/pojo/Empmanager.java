@@ -1,0 +1,14 @@
+package com.zheng.pojo;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class Empmanager {
+
+  private String username;
+  private String password;
+}

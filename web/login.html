@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" type="text/css" href="/bootstrap/css/bootstrap.min.css"/>
+    <script type="text/javascript" src="/js/jQuery.mini.js" ></script>
+    <script>
+        //设置全局ajax处理逻辑
+        $.ajaxSetup({
+            //设置ajax请求结束后的执行动作
+            complete: function (xhr) {
+                // 通过XMLHttpRequest取得响应头，sessionstatus
+                if("REDIRECT" == xhr.getResponseHeader("REDIRECT")){ //若HEADER中含有REDIRECT说明后端想重定向，
+                    var win = window;
+                    while(win != win.top){
+                        win = win.top;
+                    }
+                    win.location.href = xhr.getResponseHeader("CONTENTPATH");//将后端重定向的地址取出来,使用win.location.href去实现重定向的要求
+                }
+            }
+        });
+
+        $(function () {
+            $("#but").click(function () {
+                var url = $('form').attr('action')
+                var username = $('#username').val()
+                var password = $('#password').val()
+                if (username==""||password==""){
+                    $('.tishi').html("密码或账户不能为空白")
+                    $('.tishi').show()
+                    setInterval(function () {
+                        $('.tishi').hide()
+                    },4000)
+                    return;
+                }
+                $.get(
+                    'http://localhost:8080/'+url,
+                    // 'http://192.168.3.7:8080/'+url,
+                    {
+                        'username':username,
+                        'password':password
+                    },
+                    function (res) {
+                        $('.tishi').html(res)
+                        $('.tishi').show()
+                        setInterval(function () {
+                            $('.tishi').hide()
+                        },4000)
+                    }
+                )
+            })
+            var arr = ["#0802ee","#ee0202","#04ec23"]
+            for (let j = 0; j < 1000; j++) {
+                for (let i = 0; i < 3; i++) {
+                    setInterval(function () {
+                        $('body').css("background-color",arr[i])
+                    },300)
+                }
+            }
+
+        })
+
+    </script>
+    <style>
+        .floadAd { position: absolute;z-index: 1; display: none; }
+        .floadAd .item { display: block; }
+        .floadAd .item img { vertical-align: bottom; }
+        /* a img 的组合浏览器默认下边会有几个像素的空白，这里可以消除空白*/
+
+        img{
+            border-radius: 10px;
+            color: red;
+        }
+    </style>
+
+</head>
+<body>
+<form action="man/login"style="width: 400px;position:absolute;z-index: 10;top:20%;left: 50%;margin-left: -200px">
+    <div id="c" style="width: 100%;font-size: 30px;margin-left: 30px;color: #f9f9f9">欢迎进入管理员登录系统</div>
+    <div class="input-group" style="width: 400px">
+        <span class="input-group-addon" id="basic-addon1">用户名</span>
+        <input type="text" class="form-control" name="username" id="username" placeholder="Username" aria-describedby="basic-addon1">
+    </div>
+        <br>
+    <div class="input-group" style="width: 400px">
+        <span class="input-group-addon" id="basic-addon2">密&nbsp;&nbsp; &nbsp;码</span>
+        <input type="password" class="form-control" name="password" id="password" placeholder="password" aria-describedby="basic-addon1">
+    </div>
+        <span class="tishi" style="color: brown;display: inline-block"></span>
+        <button type="button" id="but" style="display: block;margin-left: 83%" class="btn btn-primary btn-lg">提交</button>
+
+
+</form>
+
+<div id="floadAD" class="floadAd">
+<!--    <a class="close" href="javascript:void();" style="color: red">×关闭</a>-->
+        <img src="12.jpg" width="100px" height="100px" alt="" />为了您的身心健康，请尽快登录，不要乱试密码</a>
+</div>
+
+
+<script>
+    //调用
+    FloatAd("#floadAD");
+    //漂浮窗口
+    function FloatAd(selector) {
+        var obj = $(selector);
+        //浏览器高度
+        var windowHeight = $(window).height();
+        //浏览器宽度
+        var windowWidth = $(window).width();
+        //每次水平漂浮方向及距离(单位：px)，正数向右，负数向左，如果越大的话就会看起来越不流畅，但在某些需求下你可能会需要这种效果
+        var dirX = -1.5;
+        //每次垂直漂浮方向及距离(单位：px)，正数向下，负数向上，如果越大的话就会看起来越不流畅，但在某些需求下你可能会需要这种效果
+        var dirY = -1;
+        //定期执行的时间间隔，单位毫秒
+        var delay = 30;
+        //把元素设置成在页面中间
+        obj.css({ left: windowWidth / 2 - obj.width() / 2 + "px", top: windowHeight / 2 - obj.height() / 2 + "px" });
+        //元素默认是隐藏的，避免上一句代码改变位置视觉突兀，改变位置后再显示出来
+        obj.show();
+        //定期执行，返回一个值，这个值可以用来取消定期执行
+        var handler = setInterval(move, delay);
+        //鼠标经过时暂停，离开时继续
+        obj.hover(function() {
+            //取消定期执行
+            // clearInterval(handler);
+        }, function() {
+            handler = setInterval(move, delay);
+        });
+        // //绑定关闭按钮事件
+        // obj.find(".close").click(function() {
+        //     close();
+        // });
+        //当改变窗口大小时，重新获取浏览器大小，以保证不会过界（飘出浏览器可视范围）或漂的范围小于新的大小
+        $(window).resize(function() {
+            //浏览器高度
+            windowHeight = $(window).height();
+            //浏览器宽度
+            windowWidth = $(window).width();
+        });
+        //定期执行的函数，使元素移动
+        function move() {
+            //获取当前位置，这是JQuery的函数，具体见：[http://hemin.cn/jq/position.html](http://hemin.cn/jq/position.html)
+            var currentPos = obj.position();
+            //下一个水平位置
+            var nextPosX = currentPos.left + dirX;
+            //下一个垂直位置
+            var nextPosY = currentPos.top + dirY;
+            //这一段是本站特有的需求，当漂浮到右边时关闭漂浮窗口，如不需要可删除
+            if (nextPosX >= windowWidth - obj.width()) {
+                close();
+            }
+            //如果达到左边，或者达到右边，则改变为相反方向
+            if (nextPosX <= 0 || nextPosX >= windowWidth - obj.width()) {
+                //改变方向
+                dirX = dirX * -1;
+                //为了不过界，重新获取下一个位置
+                nextPosX = currentPos.left + dirX;
+            }
+            //如果达到上边，或者达到下边，则改变为相反方向。
+            if (nextPosY <= 0 || nextPosY >= windowHeight - obj.height() - 5) {
+                //改变方向
+                dirY = dirY * -1;
+                //为了不过界，重新获取下一个位置
+                nextPosY = currentPos.top + dirY;
+            }
+            //移动到下一个位置
+            obj.css({ left: nextPosX + "px", top: nextPosY + "px" });
+        }
+        //停止漂浮，并销毁漂浮窗口
+        /*function close() {
+            clearInterval(handler);
+            obj.remove();
+        }*/
+    }
+
+</script>
+</body>
+</html>
